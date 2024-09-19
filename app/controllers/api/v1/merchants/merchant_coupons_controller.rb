@@ -1,0 +1,2 @@
+class MerchantCouponsController < ApplicationController
+end
