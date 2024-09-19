@@ -10,13 +10,15 @@ RSpec.describe "MerchantCoupons Controller" do
     describe "GET /index" do
         it "successfully runs route" do
             get api_v1_merchant_coupons_path(@merchants[0].id)
-            # binding.pry
             expect(response).to be_successful
         end
     end
 
     describe "GET /show" do
-
+        it "successfully runs route" do
+            get api_v1_merchant_coupon_path(@merchants[0].id, @merchant1_coupons[1].id)
+            expect(response).to be_successful
+        end
     end
 
     describe "POST /create" do
