@@ -22,7 +22,19 @@ RSpec.describe "MerchantCoupons Controller" do
     end
 
     describe "POST /create" do
+        it "successfully runs route" do
+            coupon_params = {name: "BOGO256",
+            amount_off: 42.00,
+            percentage: false,
+            merchant_id: @merchants[0].id,
+            active: false
+            }
 
+            headers = { "CONTENT_TYPE" => "application/json" }
+            post api_v1_merchant_coupons_path(@merchants[0].id), headers: headers, params: JSON.generate(coupon: coupon_params)
+            
+            expect(response).to be_successful
+        end
     end
 
     describe "PATCH /update" do
