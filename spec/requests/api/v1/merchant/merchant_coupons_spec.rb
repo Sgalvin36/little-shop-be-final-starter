@@ -38,7 +38,15 @@ RSpec.describe "MerchantCoupons Controller" do
     end
 
     describe "PATCH /update" do
+        it "successfully runs route" do
+            coupon_params = {active: true
+            }
 
+            headers = { "CONTENT_TYPE" => "application/json" }
+            patch api_v1_merchant_coupon_path(@merchants[0].id, @merchant1_coupons[1].id), headers: headers, params: JSON.generate(coupon: coupon_params)
+            
+            expect(response).to be_successful
+        end
     end
 
     after (:all) do
