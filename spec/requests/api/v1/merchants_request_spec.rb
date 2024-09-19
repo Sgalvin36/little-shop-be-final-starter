@@ -3,7 +3,7 @@ require "rails_helper"
 describe "Merchant endpoints", :type => :request do
   describe "Get all merchants" do
     it "should return a properly array of merchants" do
-      create_list(:merchant, 5)
+        create_list(:merchant, 5)
       get "/api/v1/merchants"
       json = JSON.parse(response.body, symbolize_names: true)
 
