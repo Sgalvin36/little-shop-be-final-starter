@@ -15,6 +15,8 @@ RSpec.describe "MerchantCoupons Controller" do
 
             coupons = JSON.parse(response.body, symbolize_names: true)
             ids = @merchant1_coupons.map {|each| each.id}
+            
+            expect(coupons[:data].count).to eq(@merchant1_coupons.count)
             coupons[:data].each do |coupon|
                 expect(ids).to include(coupon[:id].to_i)
             end
