@@ -12,3 +12,20 @@ puts "Loading PostgreSQL Data dump into local database with command:"
 puts cmd
 system(cmd)
 
+system("rails db:migrate")
+
+Coupon.create([
+    {name: "SUMMER24", percentage: false, active: true, amount_off: 10.00, merchant_id: 2},
+    {name: "FALL24", percentage: false, active: true, amount_off: 20.00, merchant_id: 2},
+    {name: "WINTER24", percentage: false, active: true, amount_off: 30.00, merchant_id: 2},
+    {name: "SPRINT24", percentage: false, active: true, amount_off: 40.00, merchant_id: 2},
+    {name: "SUMMER25", percentage: true, active: true, amount_off: 10.00, merchant_id: 2},
+    {name: "FALL25", percentage: true, active: false, amount_off: 20.00, merchant_id: 2},
+    {name: "SPRINT25", percentage: true, active: false, amount_off: 40.00, merchant_id: 2},
+    {name: "WINTER25", percentage: true, active: false, amount_off: 30.00, merchant_id: 2},
+    {name: "SUMMER25", percentage: true, active: true, amount_off: 10.00, merchant_id: 1},
+    {name: "FALL25", percentage: true, active: false, amount_off: 20.00, merchant_id: 1},
+    {name: "SPRINT25", percentage: true, active: true, amount_off: 40.00, merchant_id: 1},
+    {name: "WINTER25", percentage: true, active: false, amount_off: 30.00, merchant_id: 1},
+])
+
