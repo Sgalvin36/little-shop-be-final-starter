@@ -1,12 +1,15 @@
 class Api::V1::Merchants::CouponsController < ApplicationController
     def index
-        coupons = Coupon.all
+        merchant= Merchant.find(params[:merchant_id])
+        coupons = merchant.coupons
 
         render json: MerchantCouponSerializer.new(coupons)
     end
 
     def show
-        coupon =Coupon.find(params[:id])
+        merchant= Merchant.find(params[:merchant_id])
+        coupon = merchant.coupons.find(params[:id])
+        
 
         render json: MerchantCouponSerializer.new(coupon)
     end
@@ -18,9 +21,11 @@ class Api::V1::Merchants::CouponsController < ApplicationController
     end
 
     def update
-        updated_coupon = Coupon.update(coupon_update_params)
-        
-        render json: MerchantCouponSerializer.new(updated_coupon)
+        merchant= Merchant.find(params[:merchant_id])
+        coupon = merchant.coupons.find(params[:id])
+        updated_coupon = coupon.update(coupon_update_params)
+
+        render json: MerchantCouponSerializer.new(coupon)
     end
     
     private
