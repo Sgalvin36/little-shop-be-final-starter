@@ -7,7 +7,7 @@ RSpec.describe "MerchantCoupons Controller" do
         @merchant2_coupons = create_list(:coupon, 2, merchant_id: @merchants[2].id)
         @merchant3_coupons = create_list(:coupon, 4, merchant_id: @merchants[4].id)
     end
-
+    
     describe "GET /index" do
         it "successfully runs route and gets all coupons for one merchant" do
             get api_v1_merchant_coupons_path(@merchants[0].id)
@@ -19,6 +19,22 @@ RSpec.describe "MerchantCoupons Controller" do
             expect(coupons[:data].count).to eq(@merchant1_coupons.count)
             coupons[:data].each do |coupon|
                 expect(ids).to include(coupon[:id].to_i)
+            end
+        end
+
+        describe "Sad Path" do
+            it "handles not being given a valid merchant id gracefully" do
+                get api_v1_merchant_coupons_path(0)
+
+                expected = {errors: "Couldn't find Merchant with 'id'=0", message: "Your query could not be completed"}
+
+                expect(response).to_not be_successful
+                data = JSON.parse(response.body, symbolize_names: true)
+                expect(data).to eq(expected)
+            end
+
+            it "raises an error if merchant_id is null" do
+                expect{ get api_v1_merchant_coupons_path("") }.to raise_error(ActionController::UrlGenerationError)
             end
         end
     end
@@ -119,5 +135,11 @@ RSpec.describe "MerchantCoupons Controller" do
 
     after (:all) do
         Merchant.destroy_all
+    end
+end
+
+RSpec.describe Api::V1::Merchants::CouponsController, type: :controller do
+    it do
+        should rescue_from(ActiveRecord::RecordNotFound).with(:not_found_response)
     end
 end

@@ -1,16 +1,16 @@
 class Api::V1::Merchants::CouponsController < ApplicationController
-    def index
-        merchant= Merchant.find(params[:merchant_id])
-        coupons = merchant.coupons
+    rescue_from ActiveRecord::RecordNotFound, with: :not_found_response
+    rescue_from ActionController::ParameterMissing, ActionController::UrlGenerationError, with: :bad_request_response
 
+    before_action :set_merchant, only: [:index, :show, :update]
+    
+    def index
+        coupons = @merchant.coupons
         render json: MerchantCouponSerializer.new(coupons)
     end
 
     def show
-        merchant= Merchant.find(params[:merchant_id])
-        coupon = merchant.coupons.find(params[:id])
-        
-
+        coupon = @merchant.coupons.find(params[:id])
         render json: MerchantCouponSerializer.new(coupon)
     end
 
@@ -21,8 +21,8 @@ class Api::V1::Merchants::CouponsController < ApplicationController
     end
 
     def update
-        merchant= Merchant.find(params[:merchant_id])
-        coupon = merchant.coupons.find(params[:id])
+        
+        coupon = @merchant.coupons.find(params[:id])
         updated_coupon = coupon.update(coupon_update_params)
 
         render json: MerchantCouponSerializer.new(coupon)
@@ -36,5 +36,21 @@ class Api::V1::Merchants::CouponsController < ApplicationController
 
     def coupon_update_params
         params.require(:coupon).permit(:active)
+    end
+
+    def not_found_response(exception)
+        render json: ErrorSerializer.format_errors(exception), status: :not_found
+    end
+
+    def bad_request_response(exception)
+        render json: ErrorSerializer.format_errors(exception), status: :bad_request
+    end
+
+    def set_merchant
+        if params.has_key?(:merchant_id) && params[:merchant_id] != ""
+            @merchant= Merchant.find(params[:merchant_id])
+        else
+            raise ActionController::ParameterMissing, "Parameters are missing"
+        end
     end
 end
