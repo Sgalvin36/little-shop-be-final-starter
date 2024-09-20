@@ -15,17 +15,17 @@ system(cmd)
 system("rails db:migrate")
 
 Coupon.create([
-    {name: "SUMMER24", percentage: false, active: true, amount_off: 10.00, merchant_id: 2},
-    {name: "FALL24", percentage: false, active: true, amount_off: 20.00, merchant_id: 2},
-    {name: "WINTER24", percentage: false, active: true, amount_off: 30.00, merchant_id: 2},
-    {name: "SPRINT24", percentage: false, active: true, amount_off: 40.00, merchant_id: 2},
-    {name: "SUMMER25", percentage: true, active: true, amount_off: 10.00, merchant_id: 2},
-    {name: "FALL25", percentage: true, active: false, amount_off: 20.00, merchant_id: 2},
-    {name: "SPRINT25", percentage: true, active: false, amount_off: 40.00, merchant_id: 2},
-    {name: "WINTER25", percentage: true, active: false, amount_off: 30.00, merchant_id: 2},
-    {name: "SUMMER25", percentage: true, active: true, amount_off: 10.00, merchant_id: 1},
-    {name: "FALL25", percentage: true, active: false, amount_off: 20.00, merchant_id: 1},
-    {name: "SPRINT25", percentage: true, active: true, amount_off: 40.00, merchant_id: 1},
-    {name: "WINTER25", percentage: true, active: false, amount_off: 30.00, merchant_id: 1},
+    {name: "SUMMER24", code: "SUM24", percentage: false, active: true, amount_off: 10.00, merchant_id: 2},
+    {name: "FALL24", code: "FAL24", percentage: false, active: true, amount_off: 20.00, merchant_id: 2},
+    {name: "WINTER24", code: "WIN24", percentage: false, active: true, amount_off: 30.00, merchant_id: 2},
+    {name: "SPRINT24", code: "SPR24", percentage: false, active: true, amount_off: 40.00, merchant_id: 2},
+    {name: "SUMMER25", code: "SUM25", percentage: true, active: true, amount_off: 10.00, merchant_id: 2},
+    {name: "FALL25", code: "FAL25", percentage: true, active: false, amount_off: 20.00, merchant_id: 2},
+    {name: "SPRINT25", code: "SPR25", percentage: true, active: false, amount_off: 40.00, merchant_id: 2},
+    {name: "WINTER25", code: "WIN25", percentage: true, active: false, amount_off: 30.00, merchant_id: 2},
+    {name: "SUMMER25", code: "SUM25-1", percentage: true, active: true, amount_off: 10.00, merchant_id: 1},
+    {name: "FALL25", code: "FAL25-1", percentage: true, active: false, amount_off: 20.00, merchant_id: 1},
+    {name: "SPRINT25", code: "SPR25-1", percentage: true, active: true, amount_off: 40.00, merchant_id: 1},
+    {name: "WINTER25", code: "WIN25-1", percentage: true, active: false, amount_off: 30.00, merchant_id: 1},
 ])
 

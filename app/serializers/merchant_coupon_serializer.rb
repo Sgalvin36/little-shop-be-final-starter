@@ -1,6 +1,6 @@
 class MerchantCouponSerializer
     include JSONAPI::Serializer
-    attributes :name, :merchant_id, :percentage, :active
+    attributes :name, :code, :merchant_id, :percentage, :active
 
     attribute :amount, if: Proc.new {|record| !record.percentage} do |object| "$#{'%.2f' % object.amount_off}"
     end

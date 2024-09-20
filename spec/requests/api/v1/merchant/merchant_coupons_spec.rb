@@ -31,6 +31,7 @@ RSpec.describe "MerchantCoupons Controller" do
             coupon = coupon_data[:data]
             expect(coupon[:id].to_i).to eq(@merchant1_coupons[1].id)
             expect(coupon[:attributes][:name]).to eq(@merchant1_coupons[1].name)
+            expect(coupon[:attributes][:code]).to eq(@merchant1_coupons[1].code)
             expect(coupon[:attributes][:active]).to be_in([true, false])
             if coupon[:attributes][:percentage]
                 expect(coupon[:attributes][:percentage_off]).to eq("#{@merchant1_coupons[1].amount_off}%")
@@ -43,6 +44,7 @@ RSpec.describe "MerchantCoupons Controller" do
     describe "POST /create" do
         it "successfully runs route for dollar off" do
             coupon_params = {name: "BOGO256",
+            code: "BOGO20202",
             amount_off: 42.00,
             percentage: false,
             merchant_id: @merchants[0].id,
@@ -59,6 +61,7 @@ RSpec.describe "MerchantCoupons Controller" do
             
             expect(coupon[:attributes][:merchant_id]).to eq(coupon_params[:merchant_id])
             expect(coupon[:attributes][:name]).to eq(coupon_params[:name])
+            expect(coupon[:attributes][:code]).to eq(coupon_params[:code])
             expect(coupon[:attributes][:percentage]).to eq(coupon_params[:percentage])
             expect(coupon[:attributes][:amount]).to eq("$#{'%.2f' % coupon_params[:amount_off]}")
         end
@@ -66,6 +69,7 @@ RSpec.describe "MerchantCoupons Controller" do
         it "successfully runs route for percentage off" do
             coupon_params = {name: "BOGO256",
             amount_off: 42.00,
+            code: "BOGO20204",
             percentage: true,
             merchant_id: @merchants[0].id,
             active: false
@@ -81,6 +85,7 @@ RSpec.describe "MerchantCoupons Controller" do
             
             expect(coupon[:attributes][:merchant_id].to_i).to eq(coupon_params[:merchant_id])
             expect(coupon[:attributes][:name]).to eq(coupon_params[:name])
+            expect(coupon[:attributes][:code]).to eq(coupon_params[:code])
             expect(coupon[:attributes][:percentage]).to eq(coupon_params[:percentage])
             expect(coupon[:attributes][:percentage_off]).to eq("#{'%.2f' % coupon_params[:amount_off]}%")
         end
