@@ -9,7 +9,7 @@ RSpec.describe "MerchantCoupons Controller" do
     end
 
     describe "GET /index" do
-        it "successfully runs route" do
+        it "successfully runs route and gets all coupons for one merchant" do
             get api_v1_merchant_coupons_path(@merchants[0].id)
             expect(response).to be_successful
 
@@ -24,7 +24,7 @@ RSpec.describe "MerchantCoupons Controller" do
     end
 
     describe "GET /show" do
-        it "successfully runs route" do
+        it "successfully runs route and gets one coupon" do
             get api_v1_merchant_coupon_path(@merchants[0].id, @merchant1_coupons[1].id)
             expect(response).to be_successful
             coupon_data = JSON.parse(response.body, symbolize_names: true)
