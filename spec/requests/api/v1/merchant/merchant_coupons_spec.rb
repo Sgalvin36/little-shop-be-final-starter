@@ -105,6 +105,46 @@ RSpec.describe "MerchantCoupons Controller" do
             expect(coupon[:attributes][:percentage]).to eq(coupon_params[:percentage])
             expect(coupon[:attributes][:percentage_off]).to eq("#{'%.2f' % coupon_params[:amount_off]}%")
         end
+        
+        describe "Sad Path" do
+            it "doesn't allow duplicate codes to go through on creation" do
+                coupon_params = {name: "BOGO256",
+                code: "BOGO20202",
+                amount_off: 42.00,
+                percentage: false,
+                merchant_id: @merchants[0].id,
+                active: false
+                }
+    
+                headers = { "CONTENT_TYPE" => "application/json" }
+                post api_v1_merchant_coupons_path(@merchants[0].id), headers: headers, params: JSON.generate(coupon: coupon_params)
+                
+                expect(response).to be_successful
+
+                coupon_params = {name: "BOGO265",
+                code: "BOGO20202",
+                amount_off: 32.00,
+                percentage: true,
+                merchant_id: @merchants[0].id,
+                active: true
+                }
+
+                headers = { "CONTENT_TYPE" => "application/json" }
+                post api_v1_merchant_coupons_path(@merchants[0].id), headers: headers, params: JSON.generate(coupon: coupon_params)
+
+                expect(response).to_not be_successful
+                data = JSON.parse(response.body, symbolize_names: true)
+
+                expected = {
+                    errors: "duplicate key value violates unique constraint \"index_coupons_on_code\"",
+                    message: "Key (code)=(BOGO20202) already exists."
+                }
+                expect(data).to eq(expected)
+            end
+
+            it "only allows five codes to be active at one time" do
+            end
+        end
     end
 
     describe "PATCH /update" do

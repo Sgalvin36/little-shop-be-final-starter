@@ -1,6 +1,7 @@
 class Api::V1::Merchants::CouponsController < ApplicationController
     rescue_from ActiveRecord::RecordNotFound, with: :not_found_response
-    rescue_from ActionController::ParameterMissing, ActionController::UrlGenerationError, with: :bad_request_response
+    rescue_from ActionController::ParameterMissing, with: :bad_request_response
+    rescue_from PG::UniqueViolation, with: :not_unique_response
 
     before_action :set_merchant, only: [:index, :show, :update]
     
@@ -44,6 +45,10 @@ class Api::V1::Merchants::CouponsController < ApplicationController
 
     def bad_request_response(exception)
         render json: ErrorSerializer.format_errors(exception), status: :bad_request
+    end
+
+    def not_unique_response(exception)
+        render json: ErrorSerializer.format_unique(exception), status: :conflict
     end
 
     def set_merchant
