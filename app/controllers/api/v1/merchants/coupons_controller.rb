@@ -1,5 +1,4 @@
 class Api::V1::Merchants::CouponsController < ApplicationController
-    # rescue_from ActiveRecord::RecordNotFound, with: :not_found_response
     rescue_from PG::UniqueViolation, with: :not_unique_response
     rescue_from ActionController::ParameterMissing, with: :bad_request_response
 
