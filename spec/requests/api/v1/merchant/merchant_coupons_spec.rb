@@ -32,8 +32,8 @@ RSpec.describe "MerchantCoupons Controller" do
             expect(data[:data].count).to eq(9)
 
             coupons = data[:data]
-            (0..2).each {|n| expect(coupons[n][:attributes][:active]).to eq true }
-            (3..8).each {|n| expect(coupons[n][:attributes][:active]).to eq false}
+            (0..2).each {|n| expect(coupons[n][:attributes][:active]).to eq "Active" }
+            (3..8).each {|n| expect(coupons[n][:attributes][:active]).to eq "Inactive"}
         end
 
         describe "Sad Path" do
@@ -62,7 +62,7 @@ RSpec.describe "MerchantCoupons Controller" do
             expect(coupon[:id].to_i).to eq(@merchant1_coupons[1].id)
             expect(coupon[:attributes][:name]).to eq(@merchant1_coupons[1].name)
             expect(coupon[:attributes][:code]).to eq(@merchant1_coupons[1].code)
-            expect(coupon[:attributes][:active]).to be_in([true, false])
+            expect(coupon[:attributes][:active]).to be_in(["Active", "Inactive"])
             if coupon[:attributes][:percentage]
                 expect(coupon[:attributes][:percentage_off]).to eq("#{@merchant1_coupons[1].amount_off}%")
             else
@@ -192,7 +192,7 @@ RSpec.describe "MerchantCoupons Controller" do
             
             expect(response).to be_successful
             coupon = JSON.parse(response.body, symbolize_names: true)
-            expect(coupon[:data][:attributes][:active]).to be true
+            expect(coupon[:data][:attributes][:active]).to eq "Active"
         end
 
         it "successfully runs route to deactivate coupon" do
@@ -204,7 +204,7 @@ RSpec.describe "MerchantCoupons Controller" do
             
             expect(response).to be_successful
             coupon = JSON.parse(response.body, symbolize_names: true)
-            expect(coupon[:data][:attributes][:active]).to be false
+            expect(coupon[:data][:attributes][:active]).to eq "Inactive"
         end
     end
 
