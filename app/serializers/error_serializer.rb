@@ -13,6 +13,13 @@ class ErrorSerializer
         }
     end
 
+    def self.over_active
+        { 
+            message: "Your coupon could not be created", 
+            errors: ["Too many active coupons"] 
+        }
+    end
+
     def self.format_unique(message)
         parts = message.to_s.split("\n")
         parts[0].delete_prefix!("ERROR:  ")

@@ -26,7 +26,7 @@ RSpec.describe "MerchantCoupons Controller" do
             it "handles not being given a valid merchant id gracefully" do
                 get api_v1_merchant_coupons_path(0)
 
-                expected = {errors: "Couldn't find Merchant with 'id'=0", message: "Your query could not be completed"}
+                expected = {errors: ["Couldn't find Merchant with 'id'=0"], message: "Your query could not be completed"}
 
                 expect(response).to_not be_successful
                 data = JSON.parse(response.body, symbolize_names: true)
@@ -143,6 +143,27 @@ RSpec.describe "MerchantCoupons Controller" do
             end
 
             it "only allows five codes to be active at one time" do
+                @merchant4_coupons = create_list(:coupon, 5, active: true, merchant_id: @merchants[3].id)
+
+                coupon_params = {name: "BOGO256",
+                code: "BOGO20202",
+                amount_off: 42.00,
+                percentage: false,
+                merchant_id: @merchants[3].id,
+                active: true
+                }
+
+                headers = { "CONTENT_TYPE" => "application/json" }
+                post api_v1_merchant_coupons_path(@merchants[0].id), headers: headers, params: JSON.generate(coupon: coupon_params)
+
+                expect(response).to_not be_successful
+                data = JSON.parse(response.body, symbolize_names: true)
+
+                expected = {
+                    errors: ["Too many active coupons"],
+                    message: "Your coupon could not be created"
+                }
+                expect(data).to eq(expected)
             end
         end
     end
@@ -178,8 +199,8 @@ RSpec.describe "MerchantCoupons Controller" do
     end
 end
 
-RSpec.describe Api::V1::Merchants::CouponsController, type: :controller do
-    it do
-        should rescue_from(ActiveRecord::RecordNotFound).with(:not_found_response)
-    end
-end
+# RSpec.describe Api::V1::Merchants::CouponsController, type: :controller do
+#     it do
+#         should rescue_from(ActiveRecord::RecordNotFound).with(:not_found_response)
+#     end
+# end

@@ -1,7 +1,8 @@
 class Api::V1::Merchants::CouponsController < ApplicationController
-    rescue_from ActiveRecord::RecordNotFound, with: :not_found_response
-    rescue_from ActionController::ParameterMissing, with: :bad_request_response
+    # rescue_from ActiveRecord::RecordNotFound, with: :not_found_response
     rescue_from PG::UniqueViolation, with: :not_unique_response
+    rescue_from ActionController::ParameterMissing, with: :bad_request_response
+
 
     before_action :set_merchant, only: [:index, :show, :update]
     
@@ -16,9 +17,12 @@ class Api::V1::Merchants::CouponsController < ApplicationController
     end
 
     def create
-        new_coupon = Coupon.create(coupon_params)
-        
-        render json: MerchantCouponSerializer.new(new_coupon), status: 201
+        if Coupon.check_active(coupon_params) < 5
+            new_coupon = Coupon.create(coupon_params)
+            render json: MerchantCouponSerializer.new(new_coupon), status: 201
+        else
+            render json: ErrorSerializer.over_active, status: :bad_request
+        end
     end
 
     def update
