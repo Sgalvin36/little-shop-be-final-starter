@@ -7,7 +7,13 @@ class Api::V1::Merchants::CouponsController < ApplicationController
     before_action :set_merchant, only: [:index, :show, :update]
     
     def index
-        coupons = @merchant.coupons
+        if params[:sorted].present? && params[:sorted] == "active"
+            # binding.pry
+            coupons = Coupon.sorted_by_active(@merchant)
+        else
+            coupons = @merchant.coupons
+        end
+    
         render json: MerchantCouponSerializer.new(coupons)
     end
 

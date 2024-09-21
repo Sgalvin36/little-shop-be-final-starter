@@ -7,4 +7,8 @@ class Coupon < ApplicationRecord
         merchant.coupons.where("active = true").count
     end
 
+    def self.sorted_by_active(merchant)
+        merchant.coupons.order(active: :desc)
+    end
+
 end

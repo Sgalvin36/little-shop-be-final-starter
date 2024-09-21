@@ -22,6 +22,20 @@ RSpec.describe "MerchantCoupons Controller" do
             end
         end
 
+        it "can sort coupons by active and inactive" do
+            create_list(:coupon, 3, merchant_id: @merchants[1].id, active: false)
+            create_list(:coupon, 3, merchant_id: @merchants[1].id, active: true)
+            create_list(:coupon, 3, merchant_id: @merchants[1].id, active: false)
+            get "/api/v1/merchants/#{@merchants[1].id}/coupons?sorted=active"
+            expect(response).to be_successful
+            data = JSON.parse(response.body, symbolize_names: true)
+            expect(data[:data].count).to eq(9)
+
+            coupons = data[:data]
+            (0..2).each {|n| expect(coupons[n][:attributes][:active]).to eq true }
+            (3..8).each {|n| expect(coupons[n][:attributes][:active]).to eq false}
+        end
+
         describe "Sad Path" do
             it "handles not being given a valid merchant id gracefully" do
                 get api_v1_merchant_coupons_path(0)
