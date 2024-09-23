@@ -31,7 +31,6 @@ class Api::V1::Merchants::CouponsController < ApplicationController
     end
 
     def update
-        
         coupon = @merchant.coupons.find(params[:id])
         updated_coupon = coupon.update(coupon_update_params)
 

@@ -179,6 +179,28 @@ RSpec.describe "MerchantCoupons Controller" do
                 }
                 expect(data).to eq(expected)
             end
+
+            it "doesn't allow incomplete coupons to be created" do
+                coupon_params = {name: "BOGO265",
+                code: "BOGO20202",
+                amount_off: 32.00,
+                percentage: true,
+                merchant_id: @merchants[0].id,
+                active: true
+                }
+
+                headers = { "CONTENT_TYPE" => "application/json" }
+                post api_v1_merchant_coupons_path(@merchants[0].id), headers: headers, params: JSON.generate(coupon: coupon_params)
+
+                expect(response).to_not be_successful
+                data = JSON.parse(response.body, symbolize_names: true)
+
+                expected = {
+                    errors: "duplicate key value violates unique constraint \"index_coupons_on_code\"",
+                    message: "Key (code)=(BOGO20202) already exists."
+                }
+                expect(data).to eq(expected)
+            end
         end
     end
 
