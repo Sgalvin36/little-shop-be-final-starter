@@ -48,7 +48,14 @@ RSpec.describe "MerchantCoupons Controller" do
             end
 
             it "raises an error if merchant_id is null" do
-                expect{ get api_v1_merchant_coupons_path("") }.to raise_error(ActionController::UrlGenerationError)
+                expected = {errors: ["Couldn't find Merchant with 'id'=coupons"], message: "Your query could not be completed"}
+                id = nil
+                get "/api/v1/merchants/#{id}/coupons"
+
+
+                expect(response).to have_http_status(404)
+                data = JSON.parse(response.body, symbolize_names: true)
+                expect(data).to eq(expected)
             end
         end
     end
@@ -183,7 +190,7 @@ RSpec.describe "MerchantCoupons Controller" do
             it "doesn't allow incomplete coupons to be created" do
                 coupon_params = {name: "BOGO265",
                 code: "BOGO20202",
-                amount_off: 32.00,
+                amount_off: '',
                 percentage: true,
                 merchant_id: @merchants[0].id,
                 active: true
@@ -196,8 +203,28 @@ RSpec.describe "MerchantCoupons Controller" do
                 data = JSON.parse(response.body, symbolize_names: true)
 
                 expected = {
-                    errors: "duplicate key value violates unique constraint \"index_coupons_on_code\"",
-                    message: "Key (code)=(BOGO20202) already exists."
+                    errors: "Amount off can't be blank",
+                    message: "Your query could not be completed"
+                }
+                expect(data).to eq(expected)
+
+                coupon_params = {name: "BOGO265",
+                code: '',
+                amount_off: 12.50,
+                percentage: true,
+                merchant_id: @merchants[0].id,
+                active: true
+                }
+
+                headers = { "CONTENT_TYPE" => "application/json" }
+                post api_v1_merchant_coupons_path(@merchants[0].id), headers: headers, params: JSON.generate(coupon: coupon_params)
+
+                expect(response).to_not be_successful
+                data = JSON.parse(response.body, symbolize_names: true)
+
+                expected = {
+                    errors: "Code can't be blank",
+                    message: "Your query could not be completed"
                 }
                 expect(data).to eq(expected)
             end

@@ -20,8 +20,6 @@ class Api::V1::Merchants::InvoicesController < ApplicationController
     def set_merchant
         if params.has_key?(:merchant_id) && params[:merchant_id] != ""
             @merchant= Merchant.find(params[:merchant_id])
-        else
-            raise ActionController::ParameterMissing, "Parameters are missing"
         end
     end
 end
