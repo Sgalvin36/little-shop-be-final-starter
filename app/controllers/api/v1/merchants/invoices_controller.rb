@@ -12,6 +12,7 @@ class Api::V1::Merchants::InvoicesController < ApplicationController
 
     def show
         invoice = @merchant.invoices.find(params[:id])
+        invoice.total_update
         render json: InvoiceSerializer.new(invoice)
     end
 
