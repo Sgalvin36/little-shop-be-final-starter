@@ -29,3 +29,6 @@ Coupon.create([
     {name: "WINTER25", code: "WIN25-1", percentage: true, active: false, amount_off: 30.00, merchant_id: 1},
 ])
 
+Invoice.create([
+    {merchant_id: 2, customer_id: 2, status: "shipped", coupon_id: 2}
+])
