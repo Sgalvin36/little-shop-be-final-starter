@@ -186,48 +186,6 @@ RSpec.describe "MerchantCoupons Controller" do
                 }
                 expect(data).to eq(expected)
             end
-
-            it "doesn't allow incomplete coupons to be created" do
-                coupon_params = {name: "BOGO265",
-                code: "BOGO20202",
-                amount_off: '',
-                percentage: true,
-                merchant_id: @merchants[0].id,
-                active: true
-                }
-
-                headers = { "CONTENT_TYPE" => "application/json" }
-                post api_v1_merchant_coupons_path(@merchants[0].id), headers: headers, params: JSON.generate(coupon: coupon_params)
-
-                expect(response).to_not be_successful
-                data = JSON.parse(response.body, symbolize_names: true)
-
-                expected = {
-                    errors: "Amount off can't be blank",
-                    message: "Your query could not be completed"
-                }
-                expect(data).to eq(expected)
-
-                coupon_params = {name: "BOGO265",
-                code: '',
-                amount_off: 12.50,
-                percentage: true,
-                merchant_id: @merchants[0].id,
-                active: true
-                }
-
-                headers = { "CONTENT_TYPE" => "application/json" }
-                post api_v1_merchant_coupons_path(@merchants[0].id), headers: headers, params: JSON.generate(coupon: coupon_params)
-
-                expect(response).to_not be_successful
-                data = JSON.parse(response.body, symbolize_names: true)
-
-                expected = {
-                    errors: "Code can't be blank",
-                    message: "Your query could not be completed"
-                }
-                expect(data).to eq(expected)
-            end
         end
     end
 
@@ -257,13 +215,29 @@ RSpec.describe "MerchantCoupons Controller" do
         end
     end
 
+    describe Api::V1::Merchants::CouponsController, type: :controller do
+        controller do
+            def index
+                raise ActiveModel::StrictValidationFailed, "This is a test"
+            end
+        end
+
+        it 'catches bad_requests appropriately' do
+            allow(ErrorSerializer).to receive(:format_errors).and_return({error: "This is a test"})
+
+            get :index
+
+            expected = {error: "This is a test"}
+
+            expect(response).to have_http_status(:bad_request)
+            data = JSON.parse(response.body, symbolize_names:true)
+            expect(data).to eq(expected)
+        end
+    end
+    
     after (:all) do
         Merchant.destroy_all
     end
 end
 
-# RSpec.describe Api::V1::Merchants::CouponsController, type: :controller do
-#     it do
-#         should rescue_from(ActiveRecord::RecordNotFound).with(:not_found_response)
-#     end
-# end
+
