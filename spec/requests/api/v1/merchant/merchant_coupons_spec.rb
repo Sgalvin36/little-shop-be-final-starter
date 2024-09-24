@@ -48,7 +48,14 @@ RSpec.describe "MerchantCoupons Controller" do
             end
 
             it "raises an error if merchant_id is null" do
-                expect{ get api_v1_merchant_coupons_path("") }.to raise_error(ActionController::UrlGenerationError)
+                expected = {errors: ["Couldn't find Merchant with 'id'=coupons"], message: "Your query could not be completed"}
+                id = nil
+                get "/api/v1/merchants/#{id}/coupons"
+
+
+                expect(response).to have_http_status(404)
+                data = JSON.parse(response.body, symbolize_names: true)
+                expect(data).to eq(expected)
             end
         end
     end
@@ -208,13 +215,29 @@ RSpec.describe "MerchantCoupons Controller" do
         end
     end
 
+    describe Api::V1::Merchants::CouponsController, type: :controller do
+        controller do
+            def index
+                raise ActiveModel::StrictValidationFailed, "This is a test"
+            end
+        end
+
+        it 'catches bad_requests appropriately' do
+            allow(ErrorSerializer).to receive(:format_errors).and_return({error: "This is a test"})
+
+            get :index
+
+            expected = {error: "This is a test"}
+
+            expect(response).to have_http_status(:bad_request)
+            data = JSON.parse(response.body, symbolize_names:true)
+            expect(data).to eq(expected)
+        end
+    end
+    
     after (:all) do
         Merchant.destroy_all
     end
 end
 
-# RSpec.describe Api::V1::Merchants::CouponsController, type: :controller do
-#     it do
-#         should rescue_from(ActiveRecord::RecordNotFound).with(:not_found_response)
-#     end
-# end
+

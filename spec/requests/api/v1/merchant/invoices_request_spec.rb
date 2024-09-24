@@ -37,6 +37,14 @@ RSpec.describe "Merchant invoices endpoints" do
             expect(json[:data].count).to eq(3)
         end
 
+        it "should return all invoices if no status parameter is passed" do
+            get "/api/v1/merchants/#{@merchant1.id}/invoices"
+
+            json = JSON.parse(response.body, symbolize_names: true)
+
+            expect(response).to be_successful
+            expect(json[:data].count).to eq(4)
+        end
         it "should only get invoices for merchant given" do
             get "/api/v1/merchants/#{@merchant2.id}/invoices?status=shipped"
 
@@ -88,6 +96,80 @@ RSpec.describe "Merchant invoices endpoints" do
             expect(data[:data][:attributes][:merchant_id]).to eq(invoice_test[:merchant_id])
             expect(data[:data][:attributes][:status]).to eq(invoice_test[:status])
             expect(data[:data][:attributes][:coupon_id]).to eq(invoice_test[:coupon_id])
+        end
+
+        it "can return a specific invoice with the total added on" do
+            invoice_test = Invoice.create(customer: @customer2, merchant: @merchant1, status: "packaged")
+
+            get api_v1_merchant_invoice_path(invoice_test[:merchant_id], invoice_test.id)
+            expect(response).to be_successful
+
+            data = JSON.parse(response.body, symbolize_names: true)
+            expect(data[:data][:id].to_i).to eq(invoice_test[:id])
+            expect(data[:data][:type]).to eq("invoice")
+            
+            expect(data[:data][:attributes][:customer_id]).to eq(invoice_test[:customer_id])
+            expect(data[:data][:attributes][:merchant_id]).to eq(invoice_test[:merchant_id])
+            expect(data[:data][:attributes][:status]).to eq(invoice_test[:status])
+            expect(data[:data][:attributes][:coupon_id]).to eq(invoice_test[:coupon_id])
+            expect(data[:data][:attributes][:total_price]).to eq("0.0")
+        end
+
+        it "addeds items to the total correctly" do
+            invoice_test = Invoice.create(customer: @customer2, merchant: @merchant1, status: "packaged")
+            item = Item.create!(name: "Hairties", description: "Some funny things", unit_price: 5.00, merchant_id: @merchant1.id)
+            invoice_item = InvoiceItem.create!(item_id: item.id, invoice_id: invoice_test.id, quantity: 4, unit_price: item.unit_price)
+
+            get api_v1_merchant_invoice_path(invoice_test[:merchant_id], invoice_test.id)
+            expect(response).to be_successful
+
+            data = JSON.parse(response.body, symbolize_names: true)
+            expect(data[:data][:id].to_i).to eq(invoice_test[:id])
+            expect(data[:data][:type]).to eq("invoice")
+            
+            expect(data[:data][:attributes][:customer_id]).to eq(invoice_test[:customer_id])
+            expect(data[:data][:attributes][:merchant_id]).to eq(invoice_test[:merchant_id])
+            expect(data[:data][:attributes][:status]).to eq(invoice_test[:status])
+            expect(data[:data][:attributes][:coupon_id]).to eq(invoice_test[:coupon_id])
+            expect(data[:data][:attributes][:total_price]).to eq("20.0")
+        end
+
+        it "applies the pecentage off coupon correctly" do
+            item = Item.create!(name: "Hairties", description: "Some funny things", unit_price: 5.00, merchant_id: @merchant1.id)
+            coupon = Coupon.create!(name:"20OFF", code: "20DOLLHAIRS", merchant_id: @merchant1.id, percentage: true, active: true, amount_off: 20.00)
+            invoice_test = Invoice.create(customer: @customer2, merchant: @merchant1, status: "packaged", coupon_id: coupon.id)
+            invoice_item = InvoiceItem.create!(item_id: item.id, invoice_id: invoice_test.id, quantity: 4, unit_price: item.unit_price)
+            get api_v1_merchant_invoice_path(invoice_test[:merchant_id], invoice_test.id)
+            expect(response).to be_successful
+
+            data = JSON.parse(response.body, symbolize_names: true)
+            expect(data[:data][:id].to_i).to eq(invoice_test[:id])
+            expect(data[:data][:type]).to eq("invoice")
+            
+            expect(data[:data][:attributes][:customer_id]).to eq(invoice_test[:customer_id])
+            expect(data[:data][:attributes][:merchant_id]).to eq(invoice_test[:merchant_id])
+            expect(data[:data][:attributes][:status]).to eq(invoice_test[:status])
+            expect(data[:data][:attributes][:coupon_id]).to eq(invoice_test[:coupon_id])
+            expect(data[:data][:attributes][:total_price]).to eq("16.0")
+        end
+
+        it "applies the amount off coupon correctly" do
+            item = Item.create!(name: "Hairties", description: "Some funny things", unit_price: 5.00, merchant_id: @merchant1.id)
+            coupon = Coupon.create!(name:"20OFF", code: "20DOLLHAIRS", merchant_id: @merchant1.id, percentage: false, active: true, amount_off: 10.00)
+            invoice_test = Invoice.create(customer: @customer2, merchant: @merchant1, status: "packaged", coupon_id: coupon.id)
+            invoice_item = InvoiceItem.create!(item_id: item.id, invoice_id: invoice_test.id, quantity: 4, unit_price: item.unit_price)
+            get api_v1_merchant_invoice_path(invoice_test[:merchant_id], invoice_test.id)
+            expect(response).to be_successful
+
+            data = JSON.parse(response.body, symbolize_names: true)
+            expect(data[:data][:id].to_i).to eq(invoice_test[:id])
+            expect(data[:data][:type]).to eq("invoice")
+            
+            expect(data[:data][:attributes][:customer_id]).to eq(invoice_test[:customer_id])
+            expect(data[:data][:attributes][:merchant_id]).to eq(invoice_test[:merchant_id])
+            expect(data[:data][:attributes][:status]).to eq(invoice_test[:status])
+            expect(data[:data][:attributes][:coupon_id]).to eq(invoice_test[:coupon_id])
+            expect(data[:data][:attributes][:total_price]).to eq("10.0")
         end
     end
 end

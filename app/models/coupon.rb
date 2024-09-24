@@ -1,6 +1,10 @@
 class Coupon < ApplicationRecord
-    belongs_to :merchant
+    belongs_to :merchant, required: true
     has_many :invoices
+
+    validates :name, :code, :amount_off, presence: true 
+    validates :merchant_id, presence: {strict: true}
+    validates :amount_off, numericality: {greater_than: 0}
 
     def self.check_active(params)
         merchant = Merchant.find(params[:merchant_id])
