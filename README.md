@@ -1,14 +1,11 @@
 # Little Shop | Final Project | Backend Starter Repo
 
-This repository is the completed API for use with the Mod 2 Group Project. The FE repo for Little Shop lives [here](https://github.com/turingschool-examples/little-shop-fe-vite).
-
-This repo can be used as the starter repo for the Mod 2 final project.
-
 ## Setup
 
 ```ruby
 bundle install
-rails db:{drop,create,migrate,seed}
+rails db:{drop,create}
+rails runner ActiveRecord::Tasks::DatabaseTasks.load_seed
 rails db:schema:dump
 ```
 
